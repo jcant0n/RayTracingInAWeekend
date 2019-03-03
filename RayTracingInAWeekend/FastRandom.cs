@@ -238,5 +238,10 @@ namespace RayTracingInAWeekend
             // System.Random.
             return RealUnitInt * (int)(0x7FFFFFFF & (this.w = (this.w ^ (this.w >> 19)) ^ (t ^ (t >> 8))));
         }
+
+        public float NextFloat()
+        {
+            return (float)this.NextDouble();
+        }
     }
 }

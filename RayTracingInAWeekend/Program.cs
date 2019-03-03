@@ -12,11 +12,25 @@
 
     public unsafe class Program
     {
+        public static FastRandom rand = new FastRandom(Environment.TickCount);
+
+        public static Vector3 RandomInUnitSphere()
+        {
+            Vector3 p;
+            do
+            {
+                p = 2f * new Vector3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat()) - Vector3.One;
+            } while (p.LengthSquared() >= 1.0f);
+
+            return p;
+        }
+
         public static Vector3 Color(Ray r, Scene world)
         {
-            if (world.Hit(r, 0, float.MaxValue, out HitRecord rec))
+            if (world.Hit(r, 0.001f, float.MaxValue, out HitRecord rec))
             {
-                return 0.5f * new Vector3(rec.Normal.X + 1, rec.Normal.Y + 1, rec.Normal.Z + 1);
+                Vector3 target = rec.Position + rec.Normal + RandomInUnitSphere();
+                return 0.5f * Color(new Ray(rec.Position, target - rec.Position), world);
             }
             else
             {
@@ -28,8 +42,8 @@
 
         public static void Main(string[] args)
         {
-            int width = 200;
-            int height = 100;
+            int width = 800;
+            int height = 400;
             int nSamples = 100;
             string filename = "Render.png";
             byte[] pixels = new byte[width * height * 3];
@@ -57,8 +71,6 @@
             Scene world = new Scene(spheres);
             Camera cam = Camera.Create();
 
-            FastRandom rand = new FastRandom(Environment.TickCount);
-
             Parallel.For(0, height, j =>
             {
                 for (int i = 0; i < width; i++)
@@ -66,15 +78,18 @@
                     Vector3 col = Vector3.Zero;
                     for (int s = 0; s < nSamples; s++)
                     {
-                        float randValue1 = (float)rand.NextDouble();
-                        float randValue2 = (float)rand.NextDouble();
-                        float u = (float)(i + randValue1) / (float)width;
-                        float v = (float)(height - (j + randValue2)) / (float)height;
+                        float u = (float)(i + rand.NextFloat()) / (float)width;
+                        float v = (float)(height - (j + rand.NextFloat())) / (float)height;
 
                         Ray r = cam.GetRay(u, v);
                         col += Color(r, world);
                     }
                     col /= (float)nSamples;
+
+                    // Gamma correction
+                    col.X = MathF.Sqrt(col.X);
+                    col.Y = MathF.Sqrt(col.Y);
+                    col.Z = MathF.Sqrt(col.Z);
 
                     int index = (i + (j * width)) * 3;
                     pixels[index++] = (byte)(255.99 * col.Z);
