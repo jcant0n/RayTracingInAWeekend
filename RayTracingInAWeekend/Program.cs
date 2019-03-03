@@ -8,6 +8,7 @@
     using System.Reflection;
     using System.Runtime.Versioning;
     using System.Numerics;
+    using System.Threading.Tasks;
 
     public unsafe class Program
     {
@@ -27,8 +28,9 @@
 
         public static void Main(string[] args)
         {
-            int width = 2000;
-            int height = 1000;
+            int width = 200;
+            int height = 100;
+            int nSamples = 100;
             string filename = "Render.png";
             byte[] pixels = new byte[width * height * 3];
 
@@ -53,25 +55,33 @@
             };
 
             Scene world = new Scene(spheres);
+            Camera cam = Camera.Create();
 
-            ////Parallel.For(0, height, j =>
-            for (int j = 0; j < height; j++)
+            FastRandom rand = new FastRandom(Environment.TickCount);
+
+            Parallel.For(0, height, j =>
             {
                 for (int i = 0; i < width; i++)
                 {
-                    float u = (float)i / (float)width;
-                    float v = (float)(height - j) / (float)height;
+                    Vector3 col = Vector3.Zero;
+                    for (int s = 0; s < nSamples; s++)
+                    {
+                        float randValue1 = (float)rand.NextDouble();
+                        float randValue2 = (float)rand.NextDouble();
+                        float u = (float)(i + randValue1) / (float)width;
+                        float v = (float)(height - (j + randValue2)) / (float)height;
 
-                    Ray r = new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical);
-                    Vector3 col = Color(r, world);
+                        Ray r = cam.GetRay(u, v);
+                        col += Color(r, world);
+                    }
+                    col /= (float)nSamples;
 
                     int index = (i + (j * width)) * 3;
                     pixels[index++] = (byte)(255.99 * col.Z);
                     pixels[index++] = (byte)(255.99 * col.Y);
                     pixels[index] = (byte)(255.99 * col.X);
                 }
-            }
-            ////});
+            });
 
             sw.Stop();
             Console.WriteLine($"Elapsed Milliseconds: {sw.ElapsedMilliseconds}");
