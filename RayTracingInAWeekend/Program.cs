@@ -7,9 +7,17 @@
     using System.IO;
     using System.Reflection;
     using System.Runtime.Versioning;
+    using System.Numerics;
 
     public unsafe class Program
     {
+        public static Vector3 Color(Ray ray)
+        {
+            Vector3 unitDirection = Vector3.Normalize(ray.Direction);
+            float t = (0.5f * unitDirection.Y) + 1.0f;
+            return ((1.0f - t) * new Vector3(1f, 1f, 1f)) + (t * new Vector3(0.5f, 0.7f, 1f));
+        }
+
         public static void Main(string[] args)
         {
             int width = 200;
@@ -26,19 +34,26 @@
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+            Vector3 lowerLeftCorner = new Vector3(-2.0f, -1.0f, -1.0f);
+            Vector3 horizontal = new Vector3(4f, 0f, 0f);
+            Vector3 vertical = new Vector3(0f, 2f, 0f);
+            Vector3 origin = Vector3.Zero;
+
             ////Parallel.For(0, height, j =>
             for (int j = 0; j < height; j++)
             {
                 for (int i = 0; i < width; i++)
                 {
-                    float r = (float)i / (float)width;
-                    float g = (float)(height - j) / (float)height;
-                    float b = 0.2f;
+                    float u = (float)i / (float)width;
+                    float v = (float)(height - j) / (float)height;
+
+                    Ray r = new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical);
+                    Vector3 col = Color(r);
 
                     int index = (i + (j * width)) * 3;
-                    pixels[index++] = (byte)(255.99 * b);
-                    pixels[index++] = (byte)(255.99 * g);
-                    pixels[index] = (byte)(255.99 * r);
+                    pixels[index++] = (byte)(255.99 * col.Z);
+                    pixels[index++] = (byte)(255.99 * col.Y);
+                    pixels[index] = (byte)(255.99 * col.X);
                 }
             }
             ////});
