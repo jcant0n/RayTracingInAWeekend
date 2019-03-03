@@ -11,32 +11,24 @@
 
     public unsafe class Program
     {
-        public static bool HitSphere(Vector3 center, float radius, Ray r)
+        public static Vector3 Color(Ray r, Scene world)
         {
-            Vector3 oc = r.Origin - center;
-            float a = Vector3.Dot(r.Direction, r.Direction);
-            float b = 2f * Vector3.Dot(oc, r.Direction);
-            float c = Vector3.Dot(oc, oc) - radius * radius;
-            float discriminant = (b * b) - (4 * a * c);
-            return discriminant > 0;
-        }
-
-        public static Vector3 Color(Ray ray)
-        {
-            if (HitSphere(new Vector3(0, 0, -1f), 0.5f, ray))
+            if (world.Hit(r, 0, float.MaxValue, out HitRecord rec))
             {
-                return new Vector3(1f, 0, 0);
+                return 0.5f * new Vector3(rec.Normal.X + 1, rec.Normal.Y + 1, rec.Normal.Z + 1);
             }
-
-            Vector3 unitDirection = Vector3.Normalize(ray.Direction);
-            float t = (0.5f * unitDirection.Y) + 1.0f;
-            return ((1.0f - t) * new Vector3(1f, 1f, 1f)) + (t * new Vector3(0.5f, 0.7f, 1f));
+            else
+            {
+                Vector3 unitDirection = Vector3.Normalize(r.Direction);
+                float t = (0.5f * unitDirection.Y) + 1.0f;
+                return ((1.0f - t) * new Vector3(1f, 1f, 1f)) + (t * new Vector3(0.5f, 0.7f, 1f));
+            }
         }
 
         public static void Main(string[] args)
         {
-            int width = 200;
-            int height = 100;
+            int width = 2000;
+            int height = 1000;
             string filename = "Render.png";
             byte[] pixels = new byte[width * height * 3];
 
@@ -54,6 +46,14 @@
             Vector3 vertical = new Vector3(0f, 2f, 0f);
             Vector3 origin = Vector3.Zero;
 
+            var spheres = new[]
+            {
+                new Sphere(new Vector3(0, 0, -1f), 0.5f),
+                new Sphere(new Vector3(0, -100.5f, -1f), 100f),
+            };
+
+            Scene world = new Scene(spheres);
+
             ////Parallel.For(0, height, j =>
             for (int j = 0; j < height; j++)
             {
@@ -63,7 +63,7 @@
                     float v = (float)(height - j) / (float)height;
 
                     Ray r = new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical);
-                    Vector3 col = Color(r);
+                    Vector3 col = Color(r, world);
 
                     int index = (i + (j * width)) * 3;
                     pixels[index++] = (byte)(255.99 * col.Z);
