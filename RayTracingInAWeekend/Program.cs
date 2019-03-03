@@ -11,8 +11,23 @@
 
     public unsafe class Program
     {
+        public static bool HitSphere(Vector3 center, float radius, Ray r)
+        {
+            Vector3 oc = r.Origin - center;
+            float a = Vector3.Dot(r.Direction, r.Direction);
+            float b = 2f * Vector3.Dot(oc, r.Direction);
+            float c = Vector3.Dot(oc, oc) - radius * radius;
+            float discriminant = (b * b) - (4 * a * c);
+            return discriminant > 0;
+        }
+
         public static Vector3 Color(Ray ray)
         {
+            if (HitSphere(new Vector3(0, 0, -1f), 0.5f, ray))
+            {
+                return new Vector3(1f, 0, 0);
+            }
+
             Vector3 unitDirection = Vector3.Normalize(ray.Direction);
             float t = (0.5f * unitDirection.Y) + 1.0f;
             return ((1.0f - t) * new Vector3(1f, 1f, 1f)) + (t * new Vector3(0.5f, 0.7f, 1f));
