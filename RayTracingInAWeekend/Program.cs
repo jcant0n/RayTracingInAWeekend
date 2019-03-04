@@ -14,6 +14,25 @@
     {
         public static FastRandom rand = new FastRandom(Environment.TickCount);
 
+        public static Vector3 InUnitSphere()
+        {
+            // 3D random vector in a unit sphere
+            float r = MathF.Sqrt(rand.NextFloat());
+            float u = rand.NextFloat();
+            float v = rand.NextFloat();
+
+            var phi = MathF.Acos((2f * v) - 1f);
+            var theta = 2 * MathF.PI * u;
+
+            var x = r * MathF.Cos(theta) * MathF.Sin(phi);
+            var y = r * MathF.Sin(theta) * MathF.Sin(phi);
+            var z = r * MathF.Cos(phi);
+
+            Vector3 res = new Vector3((float)x, (float)y, (float)z);
+            return res;
+
+        }
+
         public static Vector3 RandomInUnitSphere()
         {
             Vector3 p;
@@ -29,7 +48,7 @@
         {
             if (world.Hit(r, 0.001f, float.MaxValue, out HitRecord rec))
             {
-                Vector3 target = rec.Position + rec.Normal + RandomInUnitSphere();
+                Vector3 target = rec.Position + rec.Normal + InUnitSphere();
                 return 0.5f * Color(new Ray(rec.Position, target - rec.Position), world);
             }
             else
