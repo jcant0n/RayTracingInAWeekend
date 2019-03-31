@@ -44,12 +44,18 @@
             return p;
         }
 
-        public static Vector3 Color(Ray r, Scene world)
+        public static Vector3 Color(ref Ray r, ref Scene world, uint depth)
         {
             if (world.Hit(r, 0.001f, float.MaxValue, out HitRecord rec))
             {
-                Vector3 target = rec.Position + rec.Normal + InUnitSphere();
-                return 0.5f * Color(new Ray(rec.Position, target - rec.Position), world);
+                if (depth < 50 && rec.Material.Scatter(ref r, ref rec, out Vector3 attenuation, out Ray scattered))
+                {
+                    return attenuation * Color(ref scattered, ref world, depth + 1);
+                }
+                else
+                {
+                    return Vector3.Zero;
+                }
             }
             else
             {
@@ -83,8 +89,10 @@
 
             var spheres = new[]
             {
-                new Sphere(new Vector3(0, 0, -1f), 0.5f),
-                new Sphere(new Vector3(0, -100.5f, -1f), 100f),
+                new Sphere(new Vector3(0, 0, -1f), 0.5f, new Lambertian(new Vector3(0.8f, 0.3f, 0.3f))),
+                new Sphere(new Vector3(0, -100.5f, -1f), 100f, new Lambertian(new Vector3(0.8f, 0.8f, 0f))),
+                new Sphere(new Vector3(1, -0, -1f), 0.5f, new Metal(new Vector3(0.8f, 0.6f, 0.2f), 0.3f)),
+                new Sphere(new Vector3(-1, -0, -1f), 0.5f, new Metal(new Vector3(0.8f, 0.8f, 0.8f), 1.0f)),
             };
 
             Scene world = new Scene(spheres);
@@ -101,7 +109,7 @@
                         float v = (float)(height - (j + rand.NextFloat())) / (float)height;
 
                         Ray r = cam.GetRay(u, v);
-                        col += Color(r, world);
+                        col += Color(ref r, ref world, 0);
                     }
                     col /= (float)nSamples;
 

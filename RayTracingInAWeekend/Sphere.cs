@@ -10,12 +10,14 @@ namespace RayTracingInAWeekend
     public struct Sphere
     {
         public Vector3 Center;
-        float Radius;
+        public float Radius;
+        public Material material;
 
-        public Sphere(Vector3 center, float radius)
+        public Sphere(Vector3 center, float radius, Material material)
         {
             this.Center = center;
             this.Radius = radius;
+            this.material = material;
         }
 
         public bool Hit(Ray r, float tMin, float tMax, out HitRecord rec)
@@ -34,6 +36,7 @@ namespace RayTracingInAWeekend
                     rec.T = temp;
                     rec.Position = r.PointAtParameter(rec.T);
                     rec.Normal = (rec.Position - Center) / Radius;
+                    rec.Material = material;
                     return true;
                 }
 
@@ -43,6 +46,7 @@ namespace RayTracingInAWeekend
                     rec.T = temp;
                     rec.Position = r.PointAtParameter(rec.T);
                     rec.Normal = (rec.Position - Center) / Radius;
+                    rec.Material = material;
                     return true;
                 }
             }

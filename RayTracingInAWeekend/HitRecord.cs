@@ -12,6 +12,7 @@ namespace RayTracingInAWeekend
         public Vector3 Position;
         public float T;
         public Vector3 Normal;
+        public Material Material;
 
         public static HitRecord Empty
         {
@@ -21,6 +22,7 @@ namespace RayTracingInAWeekend
                 rec.T = 0;
                 rec.Position = Vector3.Zero;
                 rec.Normal = Vector3.Zero;
+                rec.Material = null;
                 return rec;
             }
         }
