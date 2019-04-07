@@ -1,11 +1,19 @@
 # RayTracingInAWeekend
 C# implementation of Ray tracing in a weekend by Peter Shirley
 
-#### 07 - Lambertian
+#### Chapter 07 - Lambertian
 
-![alt Diffuse](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Diffuse.png)
+![alt Lambertian](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Chapter_7.png)
 
-#### 08 - Metal
+#### Chapter 08 - Metal
 
-![alt Diffuse](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Metal.png)
+![alt Metal](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Chapter_8.png)
+
+#### Chapter 09 - Dielectric
+
+![alt Dielectric](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Chapter_9.png)
+
+#### Chapter 10 - Camera
+
+![alt Camera](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Chapter_10.png)
 

@@ -69,7 +69,7 @@
         {
             int width = 800;
             int height = 400;
-            int nSamples = 100;
+            int nSamples = 1000;
             string filename = "Render.png";
             byte[] pixels = new byte[width * height * 3];
 
@@ -89,14 +89,15 @@
 
             var spheres = new[]
             {
-                new Sphere(new Vector3(0, 0, -1f), 0.5f, new Lambertian(new Vector3(0.8f, 0.3f, 0.3f))),
+                new Sphere(new Vector3(0, 0, -1f), 0.5f, new Lambertian(new Vector3(0.1f, 0.2f, 0.5f))),
                 new Sphere(new Vector3(0, -100.5f, -1f), 100f, new Lambertian(new Vector3(0.8f, 0.8f, 0f))),
                 new Sphere(new Vector3(1, -0, -1f), 0.5f, new Metal(new Vector3(0.8f, 0.6f, 0.2f), 0.3f)),
-                new Sphere(new Vector3(-1, -0, -1f), 0.5f, new Metal(new Vector3(0.8f, 0.8f, 0.8f), 1.0f)),
+                new Sphere(new Vector3(-1, -0, -1f), -0.45f, new Dielectric(1.5f)),
             };
 
             Scene world = new Scene(spheres);
-            Camera cam = Camera.Create();
+            Camera cam = Camera.Create(new Vector3(-2f, 2f, 1f), new Vector3(0, 0, -1), new Vector3(0, 1, 0), 45, (float)width / height);
+            ////Camera cam = Camera.Create();
 
             Parallel.For(0, height, j =>
             {
