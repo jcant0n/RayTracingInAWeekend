@@ -9,6 +9,7 @@
     using System.Runtime.Versioning;
     using System.Numerics;
     using System.Threading.Tasks;
+    using System.Collections.Generic;
 
     public unsafe class Program
     {
@@ -69,7 +70,7 @@
         {
             int width = 800;
             int height = 400;
-            int nSamples = 1000;
+            int nSamples = 10;
             string filename = "Render.png";
             byte[] pixels = new byte[width * height * 3];
 
@@ -87,21 +88,53 @@
             Vector3 vertical = new Vector3(0f, 2f, 0f);
             Vector3 origin = Vector3.Zero;
 
-            var spheres = new[]
+            ////var spheres = new[]
+            ////{
+            ////    new Sphere(new Vector3(0, 0, -1f), 0.5f, new Lambertian(new Vector3(0.1f, 0.2f, 0.5f))),
+            ////    new Sphere(new Vector3(0, -100.5f, -1f), 100f, new Lambertian(new Vector3(0.8f, 0.8f, 0f))),
+            ////    new Sphere(new Vector3(1, -0, -1f), 0.5f, new Metal(new Vector3(0.8f, 0.6f, 0.2f), 0.3f)),
+            ////    new Sphere(new Vector3(-1, -0, -1f), -0.45f, new Dielectric(1.5f, 1f)),
+            ////};
+
+            List<Sphere> spheres = new List<Sphere>();
+            spheres.Add(new Sphere(new Vector3(0, -1000, 0), 1000, new Lambertian(new Vector3(0.5f, 0.5f, 0.5f))));
+
+            int size = 5;
+            for (int a = -size; a < size; a++)
             {
-                new Sphere(new Vector3(0, 0, -1f), 0.5f, new Lambertian(new Vector3(0.1f, 0.2f, 0.5f))),
-                new Sphere(new Vector3(0, -100.5f, -1f), 100f, new Lambertian(new Vector3(0.8f, 0.8f, 0f))),
-                new Sphere(new Vector3(1, -0, -1f), 0.5f, new Metal(new Vector3(0.8f, 0.6f, 0.2f), 0.3f)),
-                new Sphere(new Vector3(-1, -0, -1f), -0.45f, new Dielectric(1.5f, 1f)),
-            };
+                for (int b = -size; b < size; b++)
+                {
+                    float choose_mat = rand.NextFloat();
+                    Vector3 center = new Vector3(a + 0.9f * rand.NextFloat(), 0.2f, b + 0.9f * rand.NextFloat());
+                    if ((center - new Vector3(4f, 0.2f, 0)).Length() > 0.9f)
+                    {
+                        if (choose_mat < 0.8f) // Diffuse
+                        {
+                            spheres.Add(new Sphere(center, 0.2f, new Lambertian(new Vector3(rand.NextFloat() * rand.NextFloat(), rand.NextFloat() * rand.NextFloat(), rand.NextFloat() * rand.NextFloat()))));
+                        }
+                        else if (choose_mat < 0.95f) // Metal
+                        {
+                            spheres.Add(new Sphere(center, 0.2f, new Metal(new Vector3(0.5f * (1f + rand.NextFloat()), 0.5f * (1f + rand.NextFloat()), 0.5f * (1 + rand.NextFloat())), 0.5f * rand.NextFloat())));
+                        }
+                        else // glass
+                        {
+                            spheres.Add(new Sphere(center, 0.2f, new Dielectric(1.5f, 1f)));
+                        }
+                    }
+                }
+            }
 
-            Scene world = new Scene(spheres);
+            spheres.Add(new Sphere(new Vector3(0, 1, 0), 1f, new Dielectric(1.5f, 1f)));
+            spheres.Add(new Sphere(new Vector3(-4, 1, 0), 1f, new Lambertian(new Vector3(0.4f, 0.2f, 0.1f))));
+            spheres.Add(new Sphere(new Vector3(4f, 1f, 0f), 1f, new Metal(new Vector3(0.7f, 0.6f, 0.5f), 0f)));
 
-            Vector3 lookFrom = new Vector3(3, 3, 2);
-            Vector3 lookat = new Vector3(0, 0, -1);
+            Scene world = new Scene(spheres.ToArray());
+
+            Vector3 lookFrom = new Vector3(9.5f, 2f, 2.5f);
+            Vector3 lookat = new Vector3(3, 0.5f, 0.65f);
             float dist_to_focus = (lookFrom - lookat).Length();
             float aperture = 0.01f;
-            Camera cam = Camera.Create(lookFrom, lookat, Vector3.UnitY, 20, (float)width / height, aperture, dist_to_focus);
+            Camera cam = Camera.Create(lookFrom, lookat, Vector3.UnitY, 25f, (float)width / height, aperture, dist_to_focus);
 
             Parallel.For(0, height, j =>
             {
