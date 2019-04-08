@@ -92,12 +92,16 @@
                 new Sphere(new Vector3(0, 0, -1f), 0.5f, new Lambertian(new Vector3(0.1f, 0.2f, 0.5f))),
                 new Sphere(new Vector3(0, -100.5f, -1f), 100f, new Lambertian(new Vector3(0.8f, 0.8f, 0f))),
                 new Sphere(new Vector3(1, -0, -1f), 0.5f, new Metal(new Vector3(0.8f, 0.6f, 0.2f), 0.3f)),
-                new Sphere(new Vector3(-1, -0, -1f), -0.45f, new Dielectric(1.5f)),
+                new Sphere(new Vector3(-1, -0, -1f), -0.45f, new Dielectric(1.5f, 1f)),
             };
 
             Scene world = new Scene(spheres);
-            Camera cam = Camera.Create(new Vector3(-2f, 2f, 1f), new Vector3(0, 0, -1), new Vector3(0, 1, 0), 45, (float)width / height);
-            ////Camera cam = Camera.Create();
+
+            Vector3 lookFrom = new Vector3(3, 3, 2);
+            Vector3 lookat = new Vector3(0, 0, -1);
+            float dist_to_focus = (lookFrom - lookat).Length();
+            float aperture = 0.01f;
+            Camera cam = Camera.Create(lookFrom, lookat, Vector3.UnitY, 20, (float)width / height, aperture, dist_to_focus);
 
             Parallel.For(0, height, j =>
             {

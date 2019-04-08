@@ -7,14 +7,16 @@ namespace RayTracingInAWeekend
 {
     public class Dielectric : Material
     {
-        private float ref_idx;
+        private float ri_in;
+        private float ri_out;
 
-        public Dielectric(float ri)
+        public Dielectric(float ri_in, float ri_out)
         {
-            this.ref_idx = ri;
+            this.ri_in = ri_in;
+            this.ri_out = ri_out;
         }
 
-        protected bool Refract(Vector3 view, Vector3 normal, float ni_over_nt, out Vector3 refracted)
+        protected bool Refract(ref Vector3 view, ref Vector3 normal, float ni_over_nt, out Vector3 refracted)
         {
             Vector3 uv = Vector3.Normalize(view);
             float dt = Vector3.Dot(uv, normal);
@@ -32,7 +34,7 @@ namespace RayTracingInAWeekend
             }
         }
 
-        public override bool Scatter(ref Ray ray, ref HitRecord rec, out Vector3 attenuation, out Ray scattered)
+        public override bool Scatter(ref Ray ray, ref HitRecord hit, out Vector3 attenuation, out Ray scattered)
         {
             Vector3 outward_normal;
             float ni_over_nt;
@@ -40,22 +42,22 @@ namespace RayTracingInAWeekend
             float reflect_prob;
             float cosine;
 
-            if (Vector3.Dot(ray.Direction, rec.Normal) > 0)
+            if (Vector3.Dot(ray.Direction, hit.Normal) > 0)
             {
-                outward_normal = -rec.Normal;
-                ni_over_nt = this.ref_idx;
-                cosine = this.ref_idx * Vector3.Dot(ray.Direction, rec.Normal) / ray.Direction.Length();
+                outward_normal = -hit.Normal;
+                ni_over_nt = this.ri_in / this.ri_out;
+                cosine = this.ri_in * Vector3.Dot(ray.Direction, hit.Normal) / ray.Direction.Length();
             }
             else
             {
-                outward_normal = rec.Normal;
-                ni_over_nt = 1f / this.ref_idx;
-                cosine = -Vector3.Dot(ray.Direction, rec.Normal) / ray.Direction.Length();
+                outward_normal = hit.Normal;
+                ni_over_nt = this.ri_out / this.ri_in;
+                cosine = -Vector3.Dot(ray.Direction, hit.Normal) / ray.Direction.Length();
             }
 
-            if (Refract(ray.Direction, outward_normal, ni_over_nt, out Vector3 refracted))
+            if (Refract(ref ray.Direction, ref outward_normal, ni_over_nt, out Vector3 refracted))
             {
-                reflect_prob = Schlick(cosine, this.ref_idx);
+                reflect_prob = Schlick(cosine, this.ri_in);
             }
             else
             {
@@ -64,11 +66,11 @@ namespace RayTracingInAWeekend
 
             if (Program.rand.NextFloat() < reflect_prob)
             {
-                scattered = new Ray(rec.Position, Vector3.Reflect(ray.Direction, rec.Normal));
+                scattered = new Ray(hit.Position, Vector3.Reflect(ray.Direction, hit.Normal));
             }
             else
             {
-                scattered = new Ray(rec.Position, refracted);
+                scattered = new Ray(hit.Position, refracted);
             }
 
             return true;

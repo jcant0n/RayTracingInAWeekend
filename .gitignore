@@ -61,3 +61,8 @@ RayTracingInAWeekend/obj/RayTracingInAWeekend.csproj.nuget.g.targets
 .vs/RayTracingInAWeekend/v16/Server/sqlite3/storage.ide-wal
 .vs/RayTracingInAWeekend/v16/.suo
 .vs/RayTracingInAWeekend/v15/.suo
+.vs/RayTracingInAWeekend/DesignTimeBuild/.dtbcache
+.vs/RayTracingInAWeekend/v15/Server/sqlite3/db.lock
+.vs/RayTracingInAWeekend/v15/Server/sqlite3/storage.ide
+.vs/RayTracingInAWeekend/v15/Server/sqlite3/storage.ide-shm
+.vs/RayTracingInAWeekend/v15/Server/sqlite3/storage.ide-wal

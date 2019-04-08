@@ -17,3 +17,6 @@ C# implementation of Ray tracing in a weekend by Peter Shirley
 
 ![alt Camera](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Chapter_10.png)
 
+#### Chapter 10 - Defocus Blur
+
+![alt Defocus Blur](https://github.com/jcant0n/RayTracingInAWeekend/blob/master/Screenshots/Chapter_11.png)

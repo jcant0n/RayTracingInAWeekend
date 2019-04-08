@@ -14,10 +14,10 @@ namespace RayTracingInAWeekend
             this.albedo = albedo;
         }
 
-        public override bool Scatter(ref Ray ray, ref HitRecord rec, out Vector3 attenuation, out Ray scattered)
+        public override bool Scatter(ref Ray ray, ref HitRecord hit, out Vector3 attenuation, out Ray scattered)
         {
-            Vector3 target = rec.Position + rec.Normal + Program.RandomInUnitSphere();
-            scattered = new Ray(rec.Position, target - rec.Position);
+            Vector3 target = hit.Position + hit.Normal + Program.RandomInUnitSphere();
+            scattered = new Ray(hit.Position, target - hit.Position);
             attenuation = albedo;
 
             return true;
